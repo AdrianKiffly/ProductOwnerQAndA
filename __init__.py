@@ -1,7 +1,7 @@
 import datetime
 import os
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 import google.genai as genai
 from httpx import ConnectError, RemoteProtocolError
 from dotenv import load_dotenv
@@ -72,7 +72,16 @@ def log(message):
 # print(decrypt_file("encrypted_text_doc", "encryption_key"))
 
 def main():
-    message = decrypt_file("encrypted_text_doc", "encryption_key")
+    try:
+        message = decrypt_file("encrypted_text_doc", "encryption_key")
+    except InvalidToken:
+        log("ERROR : Invalid Token\n")
+        print("Invalid Token")
+        exit(1)
+    except ValueError:
+        log("ERROR : The encryption key value is incorrect")
+        print("Encryption key is incorrect")
+        exit(1)
 
     while True:
         print("What would you like to know about the document?")
@@ -95,9 +104,13 @@ def main():
                 response = client.models.generate_content(
                     model="gemini-2.0-flash", contents=prompt
                 )
-            except ConnectError or RemoteProtocolError:
-                log("[" + str(datetime.datetime.now()) + "] : ERROR : No connection\n")
+            except ConnectError:
+                log("ERROR : No connection")
                 print("No connection")
+                exit(1)
+            except RemoteProtocolError:
+                log("ERROR : Connection error")
+                print("Connection error")
                 exit(1)
 
             print(response.text)
