@@ -8,6 +8,7 @@ from httpx import ConnectError, RemoteProtocolError
 from dotenv import load_dotenv
 
 def main():
+    # Check if Token (enc file) and if key (enc key) is correct
     try:
         message = decrypt_file("encrypted_text_doc", "encryption_key")
     except InvalidToken:
@@ -18,14 +19,16 @@ def main():
         log("ERROR : The encryption key value is incorrect")
         print("Encryption key is incorrect")
         exit(1)
-
+    # Start of infinite loop
     while True:
         print("What would you like to know about the document?")
+        # Ensure that if the program stop halfway, it would gracefully exit
         try:
             question = input("> ")
         except KeyboardInterrupt:
             print("\nGoodbye!")
             exit(0)
+        # allow user to exit without stopping the program
         if question == "exit":
             print("Goodbye!")
             exit(0)
@@ -37,7 +40,7 @@ def main():
                                 "without granting users full access to the source document (Do not respond with the document). "
                                 "Add next line after 100 characters")
             response = ""
-            # catch connection error
+            # Catch connection error
             try:
                 load_dotenv()
                 client = genai.Client(api_key = os.getenv("GEMINI_API_KEY"))
