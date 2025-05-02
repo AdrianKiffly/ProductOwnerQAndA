@@ -21,7 +21,11 @@ def main():
 
     while True:
         print("What would you like to know about the document?")
-        question = input("> ")
+        try:
+            question = input("> ")
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            exit(0)
         if question == "exit":
             print("Goodbye!")
             exit(0)
